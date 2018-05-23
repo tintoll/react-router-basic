@@ -140,6 +140,98 @@ export default App;
 
 
 
+### URL 쿼리
+
+리액트 라우터 v3에는 URL쿼리를 해석해서 객체로 만들어주는 기능이 자체적으로 있었는데 v4에서는 더이상 내장하지 않습니다. 그래서 쿼리해석하는 라이브러리를 사용하는게 좋다.
+
+```shell
+yarn add query-string
+```
+
+사용방법
+
+```javascript
+import React from 'react';
+import queryString from 'query-string';
+
+const About = ({location, match}) => {
+    const query = queryString.parse(location.search);
+    const detail = query.detail === 'true';
+    return (
+        <div>
+            <h2>About {match.params.name}</h2>
+            {detail && 'detail: blahblah'}
+        </div>
+    );
+};
+
+export default About;
+```
+
+주의할점은 받아오는 값은 모두 문자열이라는 것입니다. 
+
+### Link 컴포넌트
+
+앱내에서 다른 라우트로 이동할때는 일반 <a>태그 형식으로 하면 안된다. 왜냐하면, 새로고침을 해버리기 때문이다.
+
+새로고침하지 않기 위해선, 리액트 라우터에 있는 Link컴포넌트를 사용하면된다. 이 컴포넌트는 페이지를 새로 불러오는걸 막고, 원하는 라우트로 화면 전환해줍니다.
+
+```javascript
+import React from 'react';
+import { Link } from 'react-router-dom';
+
+const Menu = () => {
+    return (
+        <div>
+            <ul>
+                <li><Link to="/">Home</Link></li>
+                <li><Link to="/about">About</Link></li>
+                <li><Link to="/about/foo">About Foo</Link></li>
+            </ul>
+            <hr/>
+        </div>
+    );
+};
+export default Menu;
+```
+
+이 컴포넌트에 전달되는 props들은 컴포넌트 내부의 DOM에도 전달되므로, 일반 DOM엘리먼트에 설정하는 것처럼 className, style 혹은 onClick등의 이벤트를 전달해 줄수 있다.
+
+### NavLink컴포넌트
+
+NavLink컴포넌트는 Link랑 비슷한데, 설정한 URL이 활성화가 되면, 특정 스타일 혹은 클래스를 지정할 수 있게 해준다는게 틀리다.
+
+```javascript
+import React from 'react';
+import { NavLink } from 'react-router-dom';
+
+const Menu = () => {
+    const activeStyle = {
+        color: 'green',
+        fontSize: '2rem'
+    };
+
+    return (
+        <div>
+            <ul>
+                <li><NavLink exact to="/" activeStyle={activeStyle}>Home</NavLink></li>
+                <li><NavLink exact to="/about" activeStyle={activeStyle}>About</NavLink></li>
+                <li><NavLink to="/about/foo" activeStyle={activeStyle}>About Foo</NavLink></li>
+            </ul>
+            <hr/>
+        </div>
+    );
+};
+
+export default Menu;
+```
+
+Route를 지정할때처럼 중첩될수 있는 라우트들은 exact해주면 되고 특정클래스를 설정하고 싶다면 activeClassName으로 설정하면 된다.
+
+
+
+
+
 
 
 
