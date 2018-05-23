@@ -228,9 +228,68 @@ export default Menu;
 
 Route를 지정할때처럼 중첩될수 있는 라우트들은 exact해주면 되고 특정클래스를 설정하고 싶다면 activeClassName으로 설정하면 된다.
 
+### 라우트 속의 라우트
 
+라우터 v4로 업데이트 되면서 달라진 점 중 하나는 Route 내부에 Route를 설정하는 방식이 달라진것이다.
 
+v3에서는 아래와 같이
 
+```javascript
+<Route path="foo" component={Foo}>
+    <Route path=":id" component={Bar}/>
+</Route>
+```
+
+Foo컴포넌트에서 props.children의 자리에 Bar컴포넌트가 들어가는 형식이여서 모든 라우트는 최상위에 정해 주어야 했다. 
+
+하지만 v4에서는 props.children을 사용하지 않고 라우트에서 보여주는 컴포넌트 내부에 또 Route를 사용할수 있게 됐습니다.
+
+```javascript
+// Post.js
+import React from 'react';
+const Post = ({match}) => {
+    return (
+        <div>
+            포스트 {match.params.id}
+        </div>
+    );
+};
+export default Post;
+
+// Posts.js
+import React from 'react';
+import { Link, Route } from 'react-router-dom';
+import { Post } from 'pages'; 
+const Posts = ({match}) => {
+    return (
+        <div>
+           <h2>Post List</h2> 
+           <ul>
+                <li><Link to={`${match.url}/1`}>Post #1</Link></li>
+                <li><Link to={`${match.url}/2`}>Post #2</Link></li>
+                <li><Link to={`${match.url}/3`}>Post #3</Link></li>
+                <li><Link to={`${match.url}/4`}>Post #4</Link></li>
+           </ul>
+           <Route exact path={match.url} render={()=>(<h3>Please select any post</h3>)}/>
+           <Route path={`${match.url}/:id`} component={Post}/>
+        </div>
+    );
+};
+export default Posts;
+```
+
+라우트가 받는 props중 헷갈리는 부분이 있습니다. 
+
+- location.pathname
+- match.path 
+- match.url
+
+**location.pathname**는 현재 브라우저상의 위치를 알려줍니다. 이 값은 어떤 라우트에서 렌더링하던 동일합니다.
+
+**match** 는 설정한 Route와 직접적으로 관계된 값만 보여줍니다.
+
+- Posts를 보여주는 라우트에선 :id값을 설정하지 않았으니 path와 url이 둘다 /posts입니다.
+- Post를 보여주는 라우트에선 path의 경우엔 라우트에서 설정한 path값이 그대로 나타납니다. url의 경우엔 :id부분에 값이 들어간 상태로 나타납니다.
 
 
 
